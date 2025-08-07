@@ -1,0 +1,22 @@
+<div class="asistente-container">
+    <img src="assets/luti/Loro inteligente en un anillo holográfico.png" alt="Asistente Virtual" class="asistente-boton"
+        (click)="toggleChat()" />
+
+    <div class="asistente-chat" *ngIf="chatAbierto">
+        <div class="chat-header">
+            <strong>Tú Asistente Virtual Luti</strong>
+            <button (click)="toggleChat()">✖</button>
+        </div>
+
+        <div class="chat-body">
+            <div *ngFor="let msg of mensajes" [class]="msg.tipo">
+                {{ msg.texto }}
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <input [(ngModel)]="pregunta" placeholder="Haz una pregunta..." />
+            <button (click)="enviarPregunta()">Enviar</button>
+        </div>
+    </div>
+</div>
