@@ -1,22 +1,76 @@
-<div class="asistente-container">
-    <img src="assets/luti/Loro inteligente en un anillo holográfico.png" alt="Asistente Virtual" class="asistente-boton"
-        (click)="toggleChat()" />
+<div class="asistente-container-full">
+    <!-- Encabezado -->
+    <div class="chat-header">
+        <img src="assets/luti/Loro inteligente en un anillo holográfico.png" alt="Logo" class="logo" />
+        <strong>Tu Asistente Virtual Luti</strong>
+    </div>
 
-    <div class="asistente-chat" *ngIf="chatAbierto">
-        <div class="chat-header">
-            <strong>Tú Asistente Virtual Luti</strong>
-            <button (click)="toggleChat()">✖</button>
+    <!-- Mensajes -->
+    <div class="chat-body">
+        <div *ngFor="let msg of mensajes" class="mensaje" [ngClass]="msg.tipo">
+            <ng-container [ngSwitch]="msg.formato">
+                <!-- Texto -->
+                <div *ngSwitchCase="'texto'" class="burbuja-texto">
+                    {{ msg.contenido }}
+                </div>
+
+                <!-- Imagen -->
+                <div *ngSwitchCase="'imagen'" class="burbuja-imagen">
+                    <img [src]="msg.contenido" alt="Imagen subida" class="chat-imagen" />
+                </div>
+
+                <!-- Audio -->
+                <div *ngSwitchCase="'audio'" class="burbuja-audio">
+                    <audio [src]="msg.contenido" controls></audio>
+                </div>
+
+                <!-- Documento -->
+                <div *ngSwitchCase="'documento'" class="burbuja-documento">
+                    <ng-container *ngIf="esArchivoEmbebible(msg.contenido); else enlaceDoc">
+                        <iframe [src]="obtenerUrlVisor(msg.contenido)" width="100%" height="300px"></iframe>
+                    </ng-container>
+
+                    <ng-template #enlaceDoc>
+                        <a [href]="msg.contenido" target="_blank" class="chat-documento">
+                            📄 Ver documento
+                        </a>
+                    </ng-template>
+                </div>
+            </ng-container>
         </div>
+    </div>
 
-        <div class="chat-body">
-            <div *ngFor="let msg of mensajes" [class]="msg.tipo">
-                {{ msg.texto }}
+    <!-- Barra de entrada -->
+    <div class="chat-input">
+        <button class="menu-btn" (click)="toggleMenu()">+</button>
+
+        <!-- Menú de opciones -->
+        <div class="menu-opciones" *ngIf="menuAbierto">
+            <label>
+                📷 Imagen
+                <input type="file" accept="image/*" (change)="subirArchivo($event, 'imagen')" hidden />
+            </label>
+
+            <label>
+                📄 Documento
+                <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" (change)="subirArchivo($event, 'documento')"
+                    hidden />
+            </label>
+
+            <label (click)="abrirOpcionesAudio()"> 🎤 Audio </label>
+
+            <!-- Opciones de audio -->
+            <div *ngIf="opcionesAudioAbiertas" class="opciones-audio">
+                <button (click)="seleccionarArchivoAudio()">Subir archivo</button>
+                <button (click)="iniciarGrabacion()" [disabled]="grabando">
+                    {{ grabando ? "Grabando..." : "Grabar con micrófono" }}
+                </button>
+                <input type="file" id="inputAudio" accept="audio/*" (change)="subirArchivo($event, 'audio')" hidden />
             </div>
         </div>
 
-        <div class="chat-input">
-            <input [(ngModel)]="pregunta" placeholder="Haz una pregunta..." />
-            <button (click)="enviarPregunta()">Enviar</button>
-        </div>
+        <input [(ngModel)]="pregunta" placeholder="Haz una pregunta..." (keydown.enter)="enviarPregunta()" />
+
+        <button (click)="enviarPregunta()">Enviar</button>
     </div>
 </div>
